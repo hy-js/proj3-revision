@@ -1,75 +1,83 @@
-const express = require('express')
+const express = require('express');
 
 const app = express();
-const port = process.env.PORT || 3001
+const port = process.env.PORT || 3001;
 
 // Import libraries + Data
-const bcrypt = require('bcryptjs')
-const morgan = require('morgan')
-const path = require('path')
-// const ejs = require('ejs');
+const bcrypt = require('bcryptjs');
+const morgan = require('morgan');
+const path = require('path');
 
-const { users } = require('./data/data.js')
+const { users } = require('./data/data.js');
 
 // Middleware
-app.use(morgan('dev'))
-// body parser
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+// Logger
+app.use(morgan('dev'));
 
-app.set('view engine', 'ejs')
+// body parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// EJS - views by default
+app.set('view engine', 'ejs');
+
+// Static files - need path to access files directly
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTE
 // GET home page
 app.get('/', (req, res) => {
-   res.render('pages/home')
-})
+  res.render('pages/home', {title: 'Home'});
+});
 
 // GET all users
 app.get('/users', (req, res) => {
-   res.render('pages/users', {users})
-})
+  res.render('pages/users', { users, title: 'All Users'});
+});
 
 // GET user form
 app.get('/users/add', (req, res) => {
-   res.render('pages/newUser')
-})
+  res.render('pages/newUser', {title: 'Add User'});
+});
 
 // GET specific users
 app.get('/users/:user_id', (req, res) => {
-   const index = req.params.user_id
-   const result = users[index]
+  const index = req.params.user_id;
+  const user = users[index];
 
-   // validation to confirm number has been entered
-
-   if (index >= users.length){
-      res.status(400).send(`msg: User ${index} is not found`)
-   }
-   res.json(result)
-})
-
+  // validation to confirm number has been entered
+  if (index >= users.length) {
+    res.status(400).send(`msg: User ${index} is not found`);
+  }
+  res.render('pages/user', {user})
+});
 
 // POST new user
 app.post('/users', (req, res) => {
-   // Destructure variables for a user
-   const { firstname, lastname, email, password} = req.body
-   // TODO: encrypt the password with bcryptJS
-   var salt = bcrypt.genSaltSync(10);
-   var hash = bcrypt.hashSync(password, salt);
-   // Store hash in your password DB.
-   // Create new user
-   const newUser = {
-      firstname: firstname,
-     lastname: lastname,
-     email: email,
-     password: hash
-   }
+  // 1. Destructure user keys
+  const { firstname, lastname, email, password } = req.body;
+  // 2. Encrypt the password with bcryptJS
+  let salt = bcrypt.genSaltSync(10);
+  let hash = bcrypt.hashSync(password, salt);
+  // Store hash in your password DB by creating new user
+  const newUser = {
+    firstname: firstname,
+    lastname: lastname,
+    email: email,
+    password: hash
+  };
 
-   // Push newUser to data array and send back newUser
-   users.push(newUser)
-   res.redirect('/users')
-})
+  // Push newUser to data array and redirect to users
+  users.push(newUser);
+  res.redirect('/users');
+});
 
+// GET error
+app.get('*', (req, res) => {
+   res.render('pages/error', {title: '404'});
+ });
+
+// Listen to correct port
 app.listen(port, () => {
-   console.log(`Example app listening on http://localhost:${port}`)
-})
+  console.log(`Example app listening on http://localhost:${port}`);
+});
