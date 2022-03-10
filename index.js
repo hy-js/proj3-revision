@@ -7,6 +7,7 @@ const port = process.env.PORT || 3001
 const bcrypt = require('bcryptjs')
 const morgan = require('morgan')
 const path = require('path')
+// const ejs = require('ejs');
 
 const { users } = require('./data/data.js')
 
@@ -16,21 +17,22 @@ app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
+app.set('view engine', 'ejs')
 
 // ROUTE
 // GET home page
 app.get('/', (req, res) => {
-   res.send('Welcome to our schedule website')
+   res.render('pages/home')
 })
 
 // GET all users
 app.get('/users', (req, res) => {
-   res.json(users)
+   res.render('pages/users', {users})
 })
 
 // GET user form
 app.get('/users/add', (req, res) => {
-   res.send('Here is where I will add a form')
+   res.render('pages/newUser')
 })
 
 // GET specific users
@@ -63,10 +65,9 @@ app.post('/users', (req, res) => {
      password: hash
    }
 
-
    // Push newUser to data array and send back newUser
    users.push(newUser)
-   res.json(newUser)
+   res.redirect('/users')
 })
 
 app.listen(port, () => {
