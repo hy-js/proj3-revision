@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "create_db": "psql -U postgres -f sql/create_db.sql",
+    "create_tables": "psql -U postgres -d revision -f sql/create_tables.sql",
+    "seed_tables": "psql -U postgres -d revision -f sql/seed_tables.sql",
+    "setup_db": "npm run create_db && npm run create_tables && npm run seed_tables",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

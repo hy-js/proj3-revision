@@ -8,7 +8,11 @@ const bcrypt = require('bcryptjs');
 const morgan = require('morgan');
 const path = require('path');
 
-const { users } = require('./data/data.js');
+// 3b
+// const { users } = require('./data/data.js');
+
+// 3C
+const db = require('./database')
 
 // Middleware
 // Logger
@@ -32,7 +36,20 @@ app.get('/', (req, res) => {
 
 // GET all users
 app.get('/users', (req, res) => {
-  res.render('pages/users', { users, title: 'All Users'});
+  db.any('SELECT * FROM users')
+  .then((users) => {
+      // if success;
+      console.log(users)
+
+      res.render('pages/users',
+      {users,
+      title: 'ALL users'})
+  })
+  .catch((error) => {
+      // error;
+      console.log(error)
+      res.redirect("/error?message=" + error.message)
+  });
 });
 
 // GET user form
