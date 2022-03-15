@@ -23,10 +23,11 @@
         <!-- Loop through create rows for each user -->
         <% for( let index = 0; index < users.length; index++ ) { %>
         <tr>
+          <td><%= users[index].id %></td>
           <td><%= users[index].firstname %></td>
           <td><%= users[index].lastname %></td>
-          <td><a href="users/<%= index%>"><%= users[index].email %></a></td>
-          <td><%= users[index].password %></td>
+          <td><a href="users/<%= index + 1%>"><%= users[index].email %></a></td>
+          <!-- <td><%= users[index].password %></td> -->
         </tr>
         <% } %>
       </tbody>
